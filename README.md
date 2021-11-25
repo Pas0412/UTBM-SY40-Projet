@@ -2,11 +2,13 @@
 
 Ce  projet s’inspire librement du fonctionnement de  la  plate-forme  multimodale et logistique Delta3, terminal de transport combiné (rail, route et voie d’eau).
 
+Delta 3 多式联运 介绍：http://www.delta-3.com/
+
 Cette installation propose des services de regroupement de marchandises dans un même véhicule pour une même destination.
 La combinaison des modes de transport s’articule autour :
 -    Du transport ferroviaire composé d’une voie ferrée unique unidirectionnelle ;
--     Du transport maritime sur la base d’une voie d’eau bidirectionnelle ;
--     Du transport routier sur lequel circule des camions de transport ;
+-    Du transport maritime sur la base d’une voie d’eau bidirectionnelle ;
+-    Du transport routier sur lequel circule des camions de transport ;
 -    De portiques permettant de manipuler des conteneurs.
 
 交通方式的组合围绕：
@@ -21,10 +23,10 @@ La gestion de l’ensemble des aiguillages de la plate-forme est assurée à par
 Règles de fonctionnement (Figure A) :
 -    Un train est composé d’un nombre limité de wagons. Seul deux trains sont autorisés à opérer simultanément sur la voie.
 -    Seules deux péniches peuvent être amarrées en même temps.
--     Un nombre limité de camions stationnent sur la voie routière.
+-    Un nombre limité de camions stationnent sur la voie routière.
 -    Les  containers  sont  déchargés  au  fur  et  à  mesure  des  opportunités  de stockage.
--     Le portique ne peut transporter qu’un seul container à la fois.
--     Le portique opère sur toute les voies.
+-    Le portique ne peut transporter qu’un seul container à la fois.
+-    Le portique opère sur toute les voies.
 -    Lors des opérations de chargement et déchargement, les portiques ne peuvent se croiser ni se télescoper.
 -    La rotation des véhicules est essentielle dans la gestion logistique au même titre que la position des portiques.
 
@@ -70,7 +72,6 @@ makefile.
 - 注意代码的缩进，以允许更好的可读性。
 - 谨防内存泄漏和指针的使用。
 - 促进应用程序的动态性质（设置启动）。
-- 使用库和几个推荐的源文件与
-生成文件。
+- 使用库和几个推荐的源文件与生成文件。
 - 如果在其他操作系统或系统上实现，请规划与可能更改的不同行为相关的移植时间。
 
