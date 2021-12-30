@@ -13,107 +13,123 @@
 #define SIZE_BATEAU 10
 #define SIZE_TRAIN 10
 #define SIZE_CAMION 10
-#define NbTh 10
-
-pthread_t tid[SIZE_CAMION];
 pthread_mutex_t mutex;
-pthread_cond_t attendre, dormir;
+pthread_cond_t truck_wait, truck_sleep;
+pthread_t tid[5];
+int Nb_truck = 0;
+int Nb_train = 0;
+int Nb_boat = 0;
+//define 3 structs of transports: index, number of containers, destinations
+struct truck_str{
+    int i;
+    int Nb_container;
+    char des[];
+};
 
-int NbCamion = 0;
+struct train_str{
+    int i;
+    int Nb_container;
+    char des[];
+};
 
-void bateau(char * destination[]){
-    int pid = fork();
-    if(pid != 0)
-      return;
-    exit(0);
+struct boat_str{
+    int i;
+    int Nb_container;
+    char des[];
+};
+//define 3 objects of transports: 2 boats, 2 trains, 4 trucks.
+struct boat_str boat_obj[1];
+struct truck_str truck_obj[3];
+struct train_str train_obj[1];
+
+//proccess to create boat
+int cre_boat(void* arg){
+    pid_t pid;
+    pid = fork();
+    return pid;
 }
 
-void train(char * destination[]){
-    int pid = fork();
-    if(pid != 0)
-      return;
-    exit(0);
+//proccess to create train
+int cre_train(void* arg){
+    pid_t pid;
+    pid = fork();
+    return pid;
 }
 
-void manager_camion(){
+//function of truck
+void truck(struct truck_str truck_obj){
+    pthread_mutex_lock(&mutex);
+    printf("truck %d arrives\n", truck_obj.i);
+    Nb_truck ++;
+    pthread_mutex_unlock(&mutex);
+    pthread_cond_signal(&truck_sleep);
+//    printf("printf of truck %d between signal and wait\n", car.i);
+    pthread_cond_wait(&truck_wait, &mutex);
+    printf("truck %d is the first in line\n", truck_obj.i);
+    sleep(2);
+    printf("truck %d leaves\n", truck_obj.i);
+    Nb_truck --;
+    pthread_mutex_unlock(&mutex);
+}
+//function of truck
+void * func_truck(int i){
+    truck_obj[i].i = i;
+    truck(truck_obj[i]);
+    pthread_exit(NULL);
+}
+//function of managing truck
+void truck_manager(){
     while(1){
-    pthread_mutex_lock(&mutex);
-    if(NbCamion > 0){
-        pthread_mutex_unlock(&mutex);
-        pthread_cond_signal(&attendre);
-        sleep(1);
+        pthread_mutex_lock(&mutex);
+        if(Nb_truck > 0){
+            printf("next car\n");
+            pthread_mutex_unlock(&mutex);
+            pthread_cond_signal(&truck_wait);
+            sleep(1);
+            printf("the portique is working, please wait\n");
+            //works to do:
+            //juge if semaphore is available
+            //yes: V() || no: wait
+            //jude destination and send a message to object processus
+            //recieve if there is an message
+            printf("the work is done\n");
+            sleep(2);
+            pthread_mutex_unlock(&mutex);
+        }else{
+            printf("there is no car waiting\n");
+            pthread_cond_wait(&truck_sleep, &mutex);
+        }
     }
-    else{
-        printf("Il n'y a pas de camion.\n");
-        pthread_cond_wait(&dormir, &mutex);
-    }
-    }
-    
 }
-
-
-
-void camion(int i){
-    pthread_mutex_lock(&mutex);
-    printf("Le camion %d arrive\n", i);
-    pthread_mutex_unlock(&mutex);
-    pthread_cond_signal(&dormir);
-    pthread_cond_wait(&attendre, &mutex);
-    printf("Camion %d est le premier en ligne\n", i);
-    pthread_mutex_unlock(&mutex);
-    sleep(1);
-}
-
-void* func_mancamion(){
-    manager_camion();
-    pthread_exit(NULL);
-}
-void* func_camion(void* i){
-    camion((int)(size_t) i);
+//function of managing truck
+void * func_truck_manager(void* arg){
+    truck_manager();
     pthread_exit(NULL);
 }
 
-
-
-int protique1(char * destination[]){
-    int pid = fork();
-    if(pid != 0)
-      return pid;
-    
-    int pos = 0;
-    
-    
-    return 0;
-}
-
-int protique2(char * destination[]){
-    int pid = fork();
-    if(pid != 0)
-      return pid;
-    
-    int pos = 0;
-    
-    
-    return 0;
-}
-
-int main(int argc, const char * argv[]) {
-    pthread_cond_init(&attendre, NULL);
-    pthread_cond_init(&dormir, NULL);
+//proccess to create truck
+int cre_truck(){
+    pid_t pid;
+//    pid = fork();
+    int i;
     pthread_mutex_init(&mutex, NULL);
+    pthread_cond_init(&truck_wait, NULL);
+    pthread_cond_init(&truck_sleep,NULL);
     
-    pthread_create(tid + NbTh, 0, func_mancamion, (void*)NbTh);
-    for(int i = 0;i < SIZE_CAMION;i++){
-        
-        pthread_create(tid + i, 0, func_camion, (void*)(int)i);
-        NbCamion++;
+    pthread_create(tid+4,0,func_truck_manager,4);
+    for(i = 0;i < 4;i++){
+        pthread_create(tid+i, NULL, func_truck, i);
     }
-    for(int i = 0;i < SIZE_CAMION;i++){
-        
+    
+    pthread_join(tid+4, NULL);
+    for(i = 0;i < 4;i++){
         pthread_join(tid[i], NULL);
     }
-
-    return 0;
+    return pid;
 }
 
+int main(){
+    int t = cre_truck();
+    return 0;
+}
 
